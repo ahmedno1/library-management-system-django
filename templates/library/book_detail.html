@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ book.title }} | E-Library{% endblock %}
+
+{% block content %}
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card h-100">
+        {% if book.cover %}
+          <img src="{{ book.cover.url }}" class="card-img-top" alt="{{ book.title }} cover">
+        {% else %}
+          <div class="book-cover d-flex align-items-center justify-content-center text-muted">
+            <i class="bi bi-image fs-1"></i>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <span class="badge text-bg-light">{{ book.category.name }}</span>
+              <h1 class="h3 mt-2 mb-1">{{ book.title }}</h1>
+              <p class="text-muted mb-2">by {{ book.author.full_name }}</p>
+            </div>
+            <div>
+              {% if book.available_copies > 0 %}
+                <span class="badge text-bg-success">Available ({{ book.available_copies }})</span>
+              {% else %}
+                <span class="badge text-bg-danger">Unavailable</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3 d-flex align-items-center gap-2">
+            {% if book.avg_rating %}
+              <span class="rating-stars">
+                {% with full=book.avg_rating|floatformat:0 %}
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= full %}
+                      <i class="bi bi-star-fill"></i>
+                    {% else %}
+                      <i class="bi bi-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                {% endwith %}
+              </span>
+              <strong>{{ book.avg_rating|floatformat:1 }}/5</strong>
+              <small class="text-muted">({{ book.review_count }} reviews)</small>
+            {% else %}
+              <small class="text-muted">No ratings yet</small>
+            {% endif %}
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-sm-6 col-md-4">
+              <div class="text-muted small">Language</div>
+              <div class="fw-semibold">{{ book.language|default:"—" }}</div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="text-muted small">Year</div>
+              <div class="fw-semibold">{{ book.publication_year|default:"—" }}</div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="text-muted small">Pages</div>
+              <div class="fw-semibold">{{ book.pages|default:"—" }}</div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <span class="badge text-bg-secondary">Total copies: {{ book.total_copies }}</span>
+          </div>
+
+          {% if user.is_authenticated %}
+            <button class="btn btn-primary" type="button" disabled>Borrow (phase 3 wiring pending)</button>
+          {% else %}
+            <button class="btn btn-outline-secondary" type="button" disabled>Borrow (login required)</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">Reviews</h2>
+      <small class="text-muted">{{ book.review_count }} total</small>
+    </div>
+    <div class="list-group list-group-flush">
+      {% for review in reviews %}
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold">{{ review.user.get_full_name|default:review.user.username }}</div>
+              <div class="rating-stars small">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= review.stars %}
+                    <i class="bi bi-star-fill"></i>
+                  {% else %}
+                    <i class="bi bi-star"></i>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+          </div>
+          {% if review.comment %}
+            <p class="mb-0 mt-2">{{ review.comment }}</p>
+          {% else %}
+            <p class="mb-0 mt-2 text-muted">No comment provided.</p>
+          {% endif %}
+        </div>
+      {% empty %}
+        <div class="list-group-item text-muted">No reviews yet.</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

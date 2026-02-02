@@ -92,7 +92,7 @@
                 <span class="badge text-bg-secondary ms-1">Total {{ book.total_copies }}</span>
               </div>
 
-              <a href="#" class="stretched-link text-decoration-none"></a>
+              <a href="{% url 'library:book_detail' book.pk %}" class="stretched-link text-decoration-none"></a>
             </div>
           </div>
         </div>

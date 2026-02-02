@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q, Value
 from django.db.models.functions import Coalesce
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils.http import urlencode
 
 from .models import Author, Book, Category
@@ -101,3 +101,27 @@ def book_list(request):
         "preserved_query": preserved_query,
     }
     return render(request, "library/book_list.html", context)
+
+
+def book_detail(request, pk):
+    """
+    Public book detail page with metadata, availability, rating, and recent reviews.
+    """
+    book = get_object_or_404(
+        Book.objects.select_related("author", "category").annotate(
+            avg_rating=Coalesce(Avg("reviews__stars"), Value(0.0)),
+            review_count=Count("reviews"),
+        ),
+        pk=pk,
+    )
+
+    reviews = (
+        book.reviews.select_related("user")
+        .order_by("-created_at")
+    )
+
+    context = {
+        "book": book,
+        "reviews": reviews,
+    }
+    return render(request, "library/book_detail.html", context)
