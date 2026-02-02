@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Borrowed Books | E-Library{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h4 mb-1">My Borrowed Books</h1>
+      <p class="text-muted mb-0">Active loans and due dates.</p>
+    </div>
+  </div>
+
+  {% if records %}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Book</th>
+            <th>Borrowed</th>
+            <th>Due</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ record.book.title }}</div>
+                <div class="text-muted small">{{ record.book.author.full_name }} · {{ record.book.category.name }}</div>
+              </td>
+              <td>{{ record.borrowed_at|date:"M d, Y" }}</td>
+              <td>{{ record.due_at|date:"M d, Y" }}</td>
+              <td>
+                {% if record.is_overdue %}
+                  <span class="badge text-bg-danger">Overdue</span>
+                {% else %}
+                  <span class="badge text-bg-success">Due in {{ record.remaining_days }} day{{ record.remaining_days|pluralize }}</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <form method="post" action="{% url 'borrowing:return_book' record.id %}">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-secondary btn-sm">Return</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">You have no active borrowed books.</div>
+  {% endif %}
+{% endblock %}

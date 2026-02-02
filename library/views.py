@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.http import urlencode
 
 from .models import Author, Book, Category
+from borrowing.models import BorrowRecord
 
 
 def home(request):
@@ -120,8 +121,21 @@ def book_detail(request, pk):
         .order_by("-created_at")
     )
 
+    already_borrowed = False
+    can_borrow = False
+    if request.user.is_authenticated:
+        already_borrowed = BorrowRecord.objects.filter(
+            user=request.user, book=book, returned_at__isnull=True
+        ).exists()
+        active_count = BorrowRecord.objects.filter(
+            user=request.user, returned_at__isnull=True
+        ).count()
+        can_borrow = book.available_copies > 0 and not already_borrowed and active_count < 5
+
     context = {
         "book": book,
         "reviews": reviews,
+        "already_borrowed": already_borrowed,
+        "can_borrow": can_borrow,
     }
     return render(request, "library/book_detail.html", context)

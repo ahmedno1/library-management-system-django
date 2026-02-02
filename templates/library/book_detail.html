@@ -74,9 +74,22 @@
           </div>
 
           {% if user.is_authenticated %}
-            <button class="btn btn-primary" type="button" disabled>Borrow (phase 3 wiring pending)</button>
+            {% if already_borrowed %}
+              <button class="btn btn-outline-secondary" type="button" disabled>Already borrowed</button>
+            {% elif book.available_copies <= 0 %}
+              <button class="btn btn-outline-secondary" type="button" disabled>No copies available</button>
+            {% elif can_borrow %}
+              <form method="post" action="{% url 'borrowing:borrow_book' book.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">Borrow</button>
+              </form>
+            {% else %}
+              <button class="btn btn-outline-secondary" type="button" disabled>Limit reached</button>
+            {% endif %}
           {% else %}
-            <button class="btn btn-outline-secondary" type="button" disabled>Borrow (login required)</button>
+            <a class="btn btn-outline-secondary" href="{% url 'accounts:login' %}?next={% url 'library:book_detail' book.pk %}">
+              Login to borrow
+            </a>
           {% endif %}
         </div>
       </div>
