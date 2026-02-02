@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Browse Books | E-Library{% endblock %}
+
+{% block content %}
+  <section class="mb-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <form id="book-filters" class="row gy-3 gx-3 align-items-center" method="get">
+          <div class="col-12 col-md-4">
+            <label for="search" class="form-label mb-1 fw-semibold text-muted">Search</label>
+            <input id="search" name="q" type="search" value="{{ query }}" class="form-control" placeholder="Title or author">
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="category" class="form-label mb-1 fw-semibold text-muted">Category</label>
+            <select id="category" name="category" class="form-select">
+              <option value="">All categories</option>
+              {% for cat in categories %}
+                <option value="{{ cat.slug }}" {% if selected_category and cat.id == selected_category.id %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="sort" class="form-label mb-1 fw-semibold text-muted">Sort by</label>
+            <select id="sort" name="sort" class="form-select">
+              <option value="newest" {% if sort == "newest" %}selected{% endif %}>Newest</option>
+              <option value="oldest" {% if sort == "oldest" %}selected{% endif %}>Oldest</option>
+              <option value="rating" {% if sort == "rating" %}selected{% endif %}>Highest Rating</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">
+              <i class="bi bi-filter me-1"></i>Apply
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">Books</h2>
+      <div class="text-muted small">{{ page_obj.paginator.count }} found</div>
+    </div>
+
+    <div class="row g-4">
+      {% for book in page_obj.object_list %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            {% if book.cover %}
+              <img src="{{ book.cover.url }}" class="book-cover" alt="{{ book.title }} cover">
+            {% else %}
+              <div class="book-cover d-flex align-items-center justify-content-center text-muted">
+                <i class="bi bi-image fs-1"></i>
+              </div>
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex align-items-start justify-content-between">
+                <h3 class="h5 mb-1">{{ book.title }}</h3>
+                <span class="badge text-bg-light">{{ book.category.name }}</span>
+              </div>
+              <p class="text-muted mb-2">by {{ book.author.full_name }}</p>
+
+              <div class="mb-2 d-flex align-items-center gap-2">
+                {% if book.avg_rating %}
+                  <span class="rating-stars">
+                    {% with full=book.avg_rating|floatformat:0 %}
+                      {% for i in "12345" %}
+                        {% if forloop.counter <= full %}
+                          <i class="bi bi-star-fill"></i>
+                        {% else %}
+                          <i class="bi bi-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                    {% endwith %}
+                  </span>
+                  <small class="text-muted">{{ book.avg_rating|floatformat:1 }}/5</small>
+                  <small class="text-muted">({{ book.review_count }} reviews)</small>
+                {% else %}
+                  <small class="text-muted">No ratings yet</small>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                {% if book.available_copies > 0 %}
+                  <span class="badge text-bg-success">Available ({{ book.available_copies }})</span>
+                {% else %}
+                  <span class="badge text-bg-danger">Unavailable</span>
+                {% endif %}
+                <span class="badge text-bg-secondary ms-1">Total {{ book.total_copies }}</span>
+              </div>
+
+              <a href="#" class="stretched-link text-decoration-none"></a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <div class="alert alert-info mb-0">No books match your filters.</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if page_obj.has_other_pages %}
+    <nav aria-label="Books pagination">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">Previous</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+            <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+          {% elif num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">Next</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Next</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,156 @@
+:root {
+  --brand-primary: #0ea5e9;
+  --brand-accent: #f59e0b;
+  --brand-dark: #0f172a;
+  --surface: #f8fafc;
+  --card-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+body {
+  font-family: 'Manrope', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(1200px circle at 20% 20%, #e0f2fe 0, rgba(224, 242, 254, 0) 40%),
+    radial-gradient(900px circle at 80% 8%, #fff7ed 0, rgba(255, 247, 237, 0) 38%),
+    var(--surface);
+  color: var(--brand-dark);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  color: var(--brand-dark);
+  letter-spacing: 0.01em;
+}
+
+.navbar {
+  border: 1px solid #eef2ff;
+  backdrop-filter: blur(6px);
+}
+
+.navbar .brand-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--brand-primary), #38bdf8);
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.35);
+}
+
+.navbar .brand-icon.small {
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.28);
+}
+
+.navbar .nav-link {
+  font-weight: 600;
+  color: #0f172a;
+  padding: 0.5rem 0.8rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: var(--brand-primary);
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand-primary), #0284c7);
+  border: none;
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.35);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0284c7, var(--brand-primary));
+}
+
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  background: #fff;
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.messages-stack .alert {
+  border-left: 4px solid var(--brand-primary);
+}
+
+.messages-stack .alert-danger {
+  border-left-color: #ef4444;
+}
+
+.messages-stack .alert-success {
+  border-left-color: #22c55e;
+}
+
+.messages-stack .alert-warning {
+  border-left-color: var(--brand-accent);
+}
+
+footer {
+  background: #fff;
+}
+
+footer .link-secondary:hover {
+  color: var(--brand-primary) !important;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #0ea5e9 0%, #22d3ee 50%, #38bdf8 100%);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(14, 165, 233, 0.45);
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.25), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.2), transparent 25%);
+}
+
+.hero-card h1 {
+  color: #fff;
+}
+
+.hero-card .btn-light {
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+
+.book-cover {
+  width: 100%;
+  height: 220px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+  border: 1px solid #e2e8f0;
+}
+
+.rating-stars i {
+  color: #f59e0b;
+}
+
+.stat-tile {
+  border-radius: 14px;
+  padding: 1.4rem;
+  background: #fff;
+  box-shadow: var(--card-shadow);
+  border: 1px solid #f1f5f9;
+}
+
+@media (max-width: 991px) {
+  .navbar .nav-item + .nav-item {
+    margin-left: 0;
+  }
+}
