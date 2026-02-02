@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Account | E-Library{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-3">Create your account</h1>
+          <p class="text-muted mb-4">Join E-Library to discover and borrow books.</p>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+              <div class="mb-3">
+                <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                  <div class="form-text">{{ field.help_text|safe }}</div>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="text-danger small">{{ field.errors|striptags }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            <div class="d-grid">
+              <button class="btn btn-primary" type="submit">Create account</button>
+            </div>
+          </form>
+
+          <p class="mt-3 mb-0 text-muted">Already have an account? <a href="{% url 'accounts:login' %}">Log in</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

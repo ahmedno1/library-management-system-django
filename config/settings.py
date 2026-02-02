@@ -118,6 +118,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+TEMPLATES[0]["DIRS"] = [BASE_DIR / "templates"]
+
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Default borrowing duration in days
+
+BORROW_DURATION_DAYS = 14

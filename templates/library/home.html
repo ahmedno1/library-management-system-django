@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load static %}
 
 {% block title %}E-Library | Home{% endblock %}
@@ -11,7 +11,9 @@
           <p class="text-uppercase fw-semibold mb-2 opacity-75">Your digital bookshelf</p>
           <h1 class="display-5 fw-bold mb-3">Discover, borrow, and review books in one modern library.</h1>
           <p class="lead mb-4">Browse curated titles, track your favorites, and share insights with the community.</p>
-          <a class="btn btn-light btn-lg rounded-pill px-4 shadow-sm" href="/books/">
+          <a class="btn btn-light btn-lg rounded-pill px-4 shadow-sm"
+             href="{% url 'library:book_list' %}"
+             onclick="window.location.href='{% url 'library:book_list' %}'; return false;">
             Browse Books
             <i class="bi bi-arrow-right ms-2"></i>
           </a>
@@ -79,6 +81,7 @@
                   <small class="text-muted">No ratings yet</small>
                 {% endif %}
               </div>
+              <a href="{% url 'library:book_detail' book.pk %}" class="stretched-link text-decoration-none"></a>
             </div>
           </div>
         </div>
@@ -124,6 +127,7 @@
                 <small class="text-muted ms-1">({{ book.review_count }} reviews)</small>
               </div>
               <p class="text-muted small mb-0">Published {{ book.publication_year|default:"—" }}</p>
+              <a href="{% url 'library:book_detail' book.pk %}" class="stretched-link text-decoration-none"></a>
             </div>
           </div>
         </div>
@@ -164,3 +168,4 @@
     </div>
   </section>
 {% endblock %}
+
