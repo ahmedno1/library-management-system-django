@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Categories | E-Library{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 mb-0">Browse Categories</h1>
+  </div>
+  <div class="row g-4">
+    {% for category in categories %}
+      <div class="col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="fs-4">{{ category.icon|default:"📚" }}</span>
+              <span class="badge text-bg-light">{{ category.book_count }} books</span>
+            </div>
+            <h3 class="h6 mb-1">{{ category.name }}</h3>
+            <a class="stretched-link text-decoration-none" href="{% url 'library:category_detail' category.slug %}"></a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info mb-0">No categories yet.</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

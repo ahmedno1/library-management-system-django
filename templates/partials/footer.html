@@ -14,10 +14,10 @@
       </div>
       <div class="col-md-6 text-md-end">
         <div class="d-flex justify-content-md-end gap-3 small text-muted">
-          <a class="link-secondary text-decoration-none" href="/books/">Books</a>
-          <a class="link-secondary text-decoration-none" href="/categories/">Categories</a>
-          <a class="link-secondary text-decoration-none" href="/authors/">Authors</a>
-          <a class="link-secondary text-decoration-none" href="/contact/">Contact</a>
+          <a class="link-secondary text-decoration-none" href="{% url 'library:book_list' %}">Books</a>
+          <a class="link-secondary text-decoration-none" href="{% url 'library:category_list' %}">Categories</a>
+          <a class="link-secondary text-decoration-none" href="{% url 'library:author_list' %}">Authors</a>
+          <a class="link-secondary text-decoration-none" href="{% url 'library:contact' %}">Contact</a>
           <a class="link-secondary text-decoration-none" href="/admin/">Admin</a>
         </div>
         <small class="text-muted d-block mt-2">&copy; {% now "Y" %} E-Library. All rights reserved.</small>

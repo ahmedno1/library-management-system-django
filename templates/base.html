@@ -15,10 +15,10 @@
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
   {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-body">
+<body class="bg-body d-flex flex-column min-vh-100">
   {% include 'partials/navbar.html' %}
 
-  <main class="py-4">
+  <main class="py-4 flex-grow-1">
     <div class="container">
       {% if messages %}
         <div class="messages-stack mb-4">

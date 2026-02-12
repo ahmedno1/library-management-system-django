@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -17,8 +19,10 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name="reviews",
     )
-    stars = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    stars = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
     )
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -44,3 +48,7 @@ class Review(models.Model):
                 raise ValidationError(
                     "User must have borrowed and returned this book before submitting a review."
                 )
+        # enforce half-star steps
+        if self.stars is not None:
+            if (Decimal(str(self.stars)) * 2) % 1 != 0:
+                raise ValidationError({"stars": "Rating must be in 0.5 increments."})

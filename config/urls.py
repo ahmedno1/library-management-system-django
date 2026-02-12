@@ -16,10 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from accounts import views as accounts_views
 
 urlpatterns = [
     path("", include("library.urls", namespace="library")),
     path("", include("borrowing.urls", namespace="borrowing")),
     path("accounts/", include("accounts.urls", namespace="accounts")),
+    # public aliases
+    path("login/", accounts_views.login_view, name="login"),
+    path("register/", accounts_views.register_view, name="register"),
+    path("profile/", accounts_views.profile_view, name="profile"),
+    path("profile/edit/", accounts_views.profile_edit_view, name="profile_edit"),
+    path("", include("reviews.urls", namespace="reviews")),
     path("admin/", admin.site.urls),
 ]

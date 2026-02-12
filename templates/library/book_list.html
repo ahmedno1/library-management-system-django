@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load library_extras %}
 
 {% block title %}Browse Books | E-Library{% endblock %}
 
@@ -64,31 +65,25 @@
               <p class="text-muted mb-2">by {{ book.author.full_name }}</p>
 
               <div class="mb-2 d-flex align-items-center gap-2">
-                {% if book.avg_rating %}
-                  <span class="rating-stars">
-                    {% with full=book.avg_rating|floatformat:0 %}
-                      {% for i in "12345" %}
-                        {% if forloop.counter <= full %}
-                          <i class="bi bi-star-fill"></i>
-                        {% else %}
-                          <i class="bi bi-star"></i>
-                        {% endif %}
-                      {% endfor %}
+                <span class="rating-stars">
+                  {% for i in "12345" %}
+                    {% with idx=forloop.counter %}
+                      {% if book.avg_rating >= idx %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                      {% elif book.avg_rating >= idx|add:'-0.5' %}
+                        <i class="bi bi-star-half text-warning"></i>
+                      {% else %}
+                        <i class="bi bi-star text-secondary"></i>
+                      {% endif %}
                     {% endwith %}
-                  </span>
-                  <small class="text-muted">{{ book.avg_rating|floatformat:1 }}/5</small>
-                  <small class="text-muted">({{ book.review_count }} reviews)</small>
-                {% else %}
-                  <small class="text-muted">No ratings yet</small>
-                {% endif %}
+                  {% endfor %}
+                </span>
+                <small class="text-muted">{{ book.avg_rating|floatformat:1 }}/5</small>
+                <small class="text-muted">({{ book.review_count }})</small>
               </div>
 
               <div class="mb-3">
-                {% if book.available_copies > 0 %}
-                  <span class="badge text-bg-success">Available ({{ book.available_copies }})</span>
-                {% else %}
-                  <span class="badge text-bg-danger">Unavailable</span>
-                {% endif %}
+                {{ book.available_copies|book_status }}
                 <span class="badge text-bg-secondary ms-1">Total {{ book.total_copies }}</span>
               </div>
 

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} | Categories | E-Library{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <p class="text-muted mb-1">Category</p>
+      <h1 class="h4 mb-0">{{ category.name }}</h1>
+    </div>
+    <a class="btn btn-outline-secondary" href="{% url 'library:category_list' %}">&larr; All categories</a>
+  </div>
+
+  <div class="row g-4">
+    {% for book in books %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          {% if book.cover %}
+            <img src="{{ book.cover.url }}" class="book-cover" alt="{{ book.title }} cover">
+          {% else %}
+            <div class="book-cover d-flex align-items-center justify-content-center text-muted">
+              <i class="bi bi-image fs-1"></i>
+            </div>
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <h3 class="h5 mb-1">{{ book.title }}</h3>
+            <p class="text-muted mb-2">{{ book.author.full_name }}</p>
+            <div class="rating-stars mb-2 d-flex align-items-center gap-2">
+              <span>
+                {% for i in "12345" %}
+                  {% with idx=forloop.counter %}
+                    {% if book.avg_rating >= idx %}
+                      <i class="bi bi-star-fill text-warning"></i>
+                    {% elif book.avg_rating >= idx|add:'-0.5' %}
+                      <i class="bi bi-star-half text-warning"></i>
+                    {% else %}
+                      <i class="bi bi-star text-secondary"></i>
+                    {% endif %}
+                  {% endwith %}
+                {% endfor %}
+              </span>
+              <small class="text-muted">{{ book.avg_rating|floatformat:1 }}/5</small>
+              <small class="text-muted">({{ book.review_count }})</small>
+            </div>
+            <a href="{% url 'library:book_detail' book.pk %}" class="stretched-link text-decoration-none"></a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info">No books in this category yet.</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

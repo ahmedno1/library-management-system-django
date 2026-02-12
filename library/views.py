@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
-from django.db.models import Avg, Count, Q, Value
+from django.db.models import Avg, Count, Q, Value, DecimalField
 from django.db.models.functions import Coalesce
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.http import urlencode
+from django import forms
 
 from .models import Author, Book, Category
 from borrowing.models import BorrowRecord
+from reviews.models import Review
+from .models import ContactMessage
 
 
 def home(request):
@@ -16,14 +19,23 @@ def home(request):
     """
     latest_books = (
         Book.objects.select_related("author", "category")
-        .annotate(avg_rating=Coalesce(Avg("reviews__stars"), Value(0.0)))
+        .annotate(
+            avg_rating=Coalesce(
+                Avg("reviews__stars", output_field=DecimalField(max_digits=3, decimal_places=1)),
+                Value(0, output_field=DecimalField(max_digits=3, decimal_places=1)),
+            ),
+            review_count=Count("reviews"),
+        )
         .order_by("-created_at")[:6]
     )
 
     top_rated_books = (
         Book.objects.select_related("author", "category")
         .annotate(
-            avg_rating=Avg("reviews__stars"),
+            avg_rating=Coalesce(
+                Avg("reviews__stars", output_field=DecimalField(max_digits=3, decimal_places=1)),
+                Value(0, output_field=DecimalField(max_digits=3, decimal_places=1)),
+            ),
             review_count=Count("reviews"),
         )
         .filter(review_count__gt=0)
@@ -54,7 +66,10 @@ def book_list(request):
     books_qs = (
         Book.objects.select_related("author", "category")
         .annotate(
-            avg_rating=Coalesce(Avg("reviews__stars"), Value(0.0)),
+            avg_rating=Coalesce(
+                Avg("reviews__stars", output_field=DecimalField(max_digits=3, decimal_places=1)),
+                Value(0, output_field=DecimalField(max_digits=3, decimal_places=1)),
+            ),
             review_count=Count("reviews"),
         )
     )
@@ -110,7 +125,10 @@ def book_detail(request, pk):
     """
     book = get_object_or_404(
         Book.objects.select_related("author", "category").annotate(
-            avg_rating=Coalesce(Avg("reviews__stars"), Value(0.0)),
+            avg_rating=Coalesce(
+                Avg("reviews__stars", output_field=DecimalField(max_digits=3, decimal_places=1)),
+                Value(0, output_field=DecimalField(max_digits=3, decimal_places=1)),
+            ),
             review_count=Count("reviews"),
         ),
         pk=pk,
@@ -123,6 +141,9 @@ def book_detail(request, pk):
 
     already_borrowed = False
     can_borrow = False
+    user_review = None
+    can_review = False
+    has_returned = False
     if request.user.is_authenticated:
         already_borrowed = BorrowRecord.objects.filter(
             user=request.user, book=book, returned_at__isnull=True
@@ -132,10 +153,100 @@ def book_detail(request, pk):
         ).count()
         can_borrow = book.available_copies > 0 and not already_borrowed and active_count < 5
 
+        user_review = Review.objects.filter(user=request.user, book=book).first()
+        has_returned = BorrowRecord.objects.filter(
+            user=request.user, book=book, returned_at__isnull=False
+        ).exists()
+        can_review = has_returned and user_review is None
+
     context = {
         "book": book,
         "reviews": reviews,
         "already_borrowed": already_borrowed,
         "can_borrow": can_borrow,
+        "user_review": user_review,
+        "can_review": can_review,
+        "has_returned": has_returned,
     }
     return render(request, "library/book_detail.html", context)
+
+
+# Categories
+def category_list(request):
+    categories = Category.objects.annotate(
+        book_count=Count("books")
+    ).order_by("name")
+    return render(request, "library/category_list.html", {"categories": categories})
+
+
+def category_detail(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    books = (
+        category.books.select_related("author", "category")
+        .annotate(
+            avg_rating=Coalesce(
+                Avg("reviews__stars", output_field=DecimalField(max_digits=3, decimal_places=1)),
+                Value(0, output_field=DecimalField(max_digits=3, decimal_places=1)),
+            ),
+            review_count=Count("reviews"),
+        )
+        .order_by("-created_at")
+    )
+    return render(
+        request,
+        "library/category_detail.html",
+        {"category": category, "books": books},
+    )
+
+
+# Authors
+def author_list(request):
+    authors = Author.objects.annotate(book_count=Count("books")).order_by("full_name")
+    return render(request, "library/author_list.html", {"authors": authors})
+
+
+def author_detail(request, pk):
+    author = get_object_or_404(Author, pk=pk)
+    books = (
+        author.books.select_related("author", "category")
+        .annotate(
+            avg_rating=Coalesce(
+                Avg("reviews__stars", output_field=DecimalField(max_digits=3, decimal_places=1)),
+                Value(0, output_field=DecimalField(max_digits=3, decimal_places=1)),
+            ),
+            review_count=Count("reviews"),
+        )
+        .order_by("-created_at")
+    )
+    return render(request, "library/author_detail.html", {"author": author, "books": books})
+
+
+# Contact
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ["name", "email", "subject", "message"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Your name"}),
+            "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "you@example.com"}),
+            "subject": forms.TextInput(attrs={"class": "form-control", "placeholder": "Subject"}),
+            "message": forms.Textarea(attrs={"class": "form-control", "rows": 4, "placeholder": "How can we help?"}),
+        }
+
+
+def contact(request):
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Thanks! Your message has been sent.")
+            return redirect("library:contact")
+        messages.error(request, "Please correct the errors below.")
+    else:
+        form = ContactForm()
+    contact_info = {
+        "email": "support@elibrary.local",
+        "phone": "+1 (555) 123-4567",
+        "address": "123 Library Lane, Booktown, USA",
+    }
+    return render(request, "library/contact.html", {"form": form, "contact_info": contact_info})

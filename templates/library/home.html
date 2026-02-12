@@ -57,34 +57,31 @@
               <div class="book-cover d-flex align-items-center justify-content-center text-muted">
                 <i class="bi bi-image fs-1"></i>
               </div>
-            {% endif %}
-            <div class="card-body d-flex flex-column">
-              <h3 class="h5">{{ book.title }}</h3>
-              <p class="text-muted mb-2">{{ book.author.full_name }} · {{ book.category.name }}</p>
-              <div class="mt-auto">
-                {% if book.avg_rating %}
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="rating-stars">
-                      {% with rounded=book.avg_rating|floatformat:0 %}
-                        {% for i in "12345" %}
-                          {% if forloop.counter <= rounded %}
-                            <i class="bi bi-star-fill"></i>
-                          {% else %}
-                            <i class="bi bi-star"></i>
-                          {% endif %}
-                        {% endfor %}
+              {% endif %}
+              <div class="card-body d-flex flex-column">
+                <h3 class="h5">{{ book.title }}</h3>
+                <p class="text-muted mb-2">{{ book.author.full_name }} · {{ book.category.name }}</p>
+                <div class="mt-auto d-flex align-items-center gap-2">
+                  <span class="rating-stars">
+                    {% for i in "12345" %}
+                      {% with idx=forloop.counter %}
+                        {% if book.avg_rating >= idx %}
+                          <i class="bi bi-star-fill text-warning"></i>
+                        {% elif book.avg_rating >= idx|add:'-0.5' %}
+                          <i class="bi bi-star-half text-warning"></i>
+                        {% else %}
+                          <i class="bi bi-star text-secondary"></i>
+                        {% endif %}
                       {% endwith %}
-                    </div>
-                    <small class="text-muted">{{ book.avg_rating|floatformat:1 }}/5</small>
-                  </div>
-                {% else %}
-                  <small class="text-muted">No ratings yet</small>
-                {% endif %}
+                    {% endfor %}
+                  </span>
+                  <small class="text-muted">{{ book.avg_rating|floatformat:1 }}/5</small>
+                  <small class="text-muted">({{ book.review_count }})</small>
+                </div>
+                <a href="{% url 'library:book_detail' book.pk %}" class="stretched-link text-decoration-none"></a>
               </div>
-              <a href="{% url 'library:book_detail' book.pk %}" class="stretched-link text-decoration-none"></a>
             </div>
           </div>
-        </div>
       {% empty %}
         <div class="col-12">
           <div class="alert alert-info mb-0">No books added yet.</div>
@@ -111,20 +108,22 @@
             <div class="card-body d-flex flex-column">
               <h3 class="h5 mb-1">{{ book.title }}</h3>
               <p class="text-muted mb-2">{{ book.author.full_name }} · {{ book.category.name }}</p>
-              <div class="rating-stars mb-2">
-                {% with avg=book.avg_rating|default:0 %}
-                  {% with full=avg|floatformat:0 %}
-                    {% for i in "12345" %}
-                      {% if forloop.counter <= full %}
-                        <i class="bi bi-star-fill"></i>
+              <div class="rating-stars mb-2 d-flex align-items-center gap-2">
+                <span>
+                  {% for i in "12345" %}
+                    {% with idx=forloop.counter %}
+                      {% if book.avg_rating >= idx %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                      {% elif book.avg_rating >= idx|add:'-0.5' %}
+                        <i class="bi bi-star-half text-warning"></i>
                       {% else %}
-                        <i class="bi bi-star"></i>
+                        <i class="bi bi-star text-secondary"></i>
                       {% endif %}
-                    {% endfor %}
-                  {% endwith %}
-                {% endwith %}
-                <span class="ms-2 fw-semibold">{{ book.avg_rating|floatformat:1 }}/5</span>
-                <small class="text-muted ms-1">({{ book.review_count }} reviews)</small>
+                    {% endwith %}
+                  {% endfor %}
+                </span>
+                <span class="fw-semibold">{{ book.avg_rating|floatformat:1 }}/5</span>
+                <small class="text-muted">({{ book.review_count }} reviews)</small>
               </div>
               <p class="text-muted small mb-0">Published {{ book.publication_year|default:"—" }}</p>
               <a href="{% url 'library:book_detail' book.pk %}" class="stretched-link text-decoration-none"></a>

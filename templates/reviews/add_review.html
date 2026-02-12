@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Review {{ book.title }} | E-Library{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-2">Write a review</h1>
+          <p class="text-muted mb-3">for <strong>{{ book.title }}</strong> by {{ book.author.full_name }}</p>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Rating</label>
+              <div class="d-flex align-items-center gap-2">
+                <div class="rating-input d-flex align-items-center gap-1" data-rating-group data-current="{{ form.initial.stars|default:'0' }}">
+                  {% for star in "12345" %}
+                    <button type="button" class="btn btn-link p-0 star-icon text-secondary" data-index="{{ forloop.counter }}">
+                      <i class="bi bi-star"></i>
+                    </button>
+                  {% endfor %}
+                </div>
+                {{ form.stars }}
+              </div>
+              {% if form.stars.errors %}
+                <div class="text-danger small">{{ form.stars.errors|striptags }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold" for="{{ form.comment.id_for_label }}">Comment</label>
+              {{ form.comment }}
+              {% if form.comment.errors %}
+                <div class="text-danger small">{{ form.comment.errors|striptags }}</div>
+              {% endif %}
+              <div class="form-text">Optional, but helpful for other readers.</div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary" type="submit">Submit review</button>
+              <a class="btn btn-outline-secondary" href="{% url 'library:book_detail' book.pk %}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
