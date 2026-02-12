@@ -8,5 +8,10 @@ __pycache__/
 # Database
 db.sqlite3
 
+# Uploaded media (ImageField uploads)
+users/
+authors/
+books/
+
 # Environment variables
 .env

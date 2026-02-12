@@ -62,7 +62,9 @@
                 <h3 class="h5 mb-1">{{ book.title }}</h3>
                 <span class="badge text-bg-light">{{ book.category.name }}</span>
               </div>
-              <p class="text-muted mb-2">by {{ book.author.full_name }}</p>
+              <p class="text-muted mb-2">
+                by <a href="{% url 'library:author_detail' book.author.pk %}">{{ book.author.full_name }}</a>
+              </p>
 
               <div class="mb-2 d-flex align-items-center gap-2">
                 <span class="rating-stars">

@@ -11,7 +11,7 @@
           <h1 class="h4 mb-3">Create your account</h1>
           <p class="text-muted mb-4">Join E-Library to discover and borrow books.</p>
 
-          <form method="post" novalidate>
+          <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             {% for field in form %}
               <div class="mb-3">
@@ -27,7 +27,7 @@
             {% endfor %}
 
             <div class="d-grid">
-              <button class="btn btn-primary" type="submit">Create account</button>
+              <button class="btn btn-primary" type="submit">Create Account</button>
             </div>
           </form>
 

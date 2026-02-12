@@ -23,7 +23,9 @@
             <div>
               <span class="badge text-bg-light">{{ book.category.name }}</span>
               <h1 class="h3 mt-2 mb-1">{{ book.title }}</h1>
-              <p class="text-muted mb-2">by {{ book.author.full_name }}</p>
+                <p class="text-muted mb-2">
+                  by <a href="{% url 'library:author_detail' book.author.pk %}">{{ book.author.full_name }}</a>
+                </p>
             </div>
             <div>
               {% if book.available_copies > 0 %}

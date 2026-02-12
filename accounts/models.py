@@ -13,8 +13,9 @@ class Profile(models.Model):
         on_delete=models.CASCADE,
         related_name="profile",
     )
+    full_name = models.CharField(max_length=150, blank=True)
     photo = models.ImageField(upload_to=user_profile_photo_path, blank=True, null=True)
-    phone = models.CharField(max_length=30, blank=True)
+    phone_number = models.CharField(max_length=30, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

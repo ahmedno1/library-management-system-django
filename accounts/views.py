@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -11,15 +12,20 @@ from .models import Profile
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect("library:home")
+        return redirect("profile")
 
     if request.method == "POST":
-        form = RegisterForm(request.POST)
+        form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()
+            try:
+                user = form.save()
+            except IntegrityError:
+                form.add_error("username", "A user with that username already exists.")
+                messages.error(request, "Please choose a different username.")
+                return render(request, "accounts/register.html", {"form": form})
             messages.success(request, "Account created successfully. You are now logged in.")
             login(request, user)
-            return redirect("library:home")
+            return redirect("profile")
         messages.error(request, "Please correct the errors below.")
     else:
         form = RegisterForm()

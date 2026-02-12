@@ -17,7 +17,7 @@
               </div>
             {% endif %}
             <div>
-              <h1 class="h4 mb-1">{{ request.user.get_full_name|default:request.user.username }}</h1>
+              <h1 class="h4 mb-1">{{ profile.full_name|default:request.user.username }}</h1>
               <p class="text-muted mb-0">{{ request.user.email }}</p>
             </div>
             <div class="ms-auto">
@@ -33,16 +33,8 @@
               <div class="fw-semibold">{{ request.user.username }}</div>
             </div>
             <div class="col-md-6">
-              <div class="text-muted small">Phone</div>
-              <div class="fw-semibold">{{ profile.phone|default:"—" }}</div>
-            </div>
-            <div class="col-md-6">
-              <div class="text-muted small">First name</div>
-              <div class="fw-semibold">{{ request.user.first_name|default:"—" }}</div>
-            </div>
-            <div class="col-md-6">
-              <div class="text-muted small">Last name</div>
-              <div class="fw-semibold">{{ request.user.last_name|default:"—" }}</div>
+              <div class="text-muted small">Phone number</div>
+              <div class="fw-semibold">{{ profile.phone_number|default:"—" }}</div>
             </div>
           </div>
         </div>

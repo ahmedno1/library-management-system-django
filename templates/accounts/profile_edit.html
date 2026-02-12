@@ -15,20 +15,14 @@
             {% csrf_token %}
 
             <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label fw-semibold" for="{{ user_form.first_name.id_for_label }}">First name</label>
-                {{ user_form.first_name }}
-                {% if user_form.first_name.errors %}
-                  <div class="text-danger small">{{ user_form.first_name.errors|striptags }}</div>
+              <div class="col-12">
+                <label class="form-label fw-semibold" for="{{ profile_form.full_name.id_for_label }}">Full name</label>
+                {{ profile_form.full_name }}
+                {% if profile_form.full_name.errors %}
+                  <div class="text-danger small">{{ profile_form.full_name.errors|striptags }}</div>
                 {% endif %}
               </div>
-              <div class="col-md-6">
-                <label class="form-label fw-semibold" for="{{ user_form.last_name.id_for_label }}">Last name</label>
-                {{ user_form.last_name }}
-                {% if user_form.last_name.errors %}
-                  <div class="text-danger small">{{ user_form.last_name.errors|striptags }}</div>
-                {% endif %}
-              </div>
+
               <div class="col-12">
                 <label class="form-label fw-semibold" for="{{ user_form.email.id_for_label }}">Email</label>
                 {{ user_form.email }}
@@ -38,10 +32,10 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label fw-semibold" for="{{ profile_form.phone.id_for_label }}">Phone</label>
-                {{ profile_form.phone }}
-                {% if profile_form.phone.errors %}
-                  <div class="text-danger small">{{ profile_form.phone.errors|striptags }}</div>
+                <label class="form-label fw-semibold" for="{{ profile_form.phone_number.id_for_label }}">Phone number</label>
+                {{ profile_form.phone_number }}
+                {% if profile_form.phone_number.errors %}
+                  <div class="text-danger small">{{ profile_form.phone_number.errors|striptags }}</div>
                 {% endif %}
               </div>
               <div class="col-md-6">
